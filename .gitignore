@@ -130,3 +130,5 @@ dmypy.json
 
 # added by wab
 *.weights
+/yolo
+/yolo_helmet
