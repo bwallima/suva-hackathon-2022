@@ -38,16 +38,18 @@ class cyclistCounter():
                 scores = detect[5:]
                 class_id = np.argmax(scores)
                 conf = scores[class_id]
-                if conf > 0.3:
-                    center_x = int(detect[0] * width)
-                    center_y = int(detect[1] * height)
-                    w = int(detect[2] * width)
-                    h = int(detect[3] * height)
-                    x = int(center_x - w/2)
-                    y = int(center_y - h / 2)
-                    boxes.append([x, y, w, h])
-                    confs.append(float(conf))
-                    class_ids.append(class_id)
+                #ignoring all classes except the first two (person & bicycle) of the coco.names list
+                if class_id <=1:
+                    if conf > 0.3:
+                        center_x = int(detect[0] * width)
+                        center_y = int(detect[1] * height)
+                        w = int(detect[2] * width)
+                        h = int(detect[3] * height)
+                        x = int(center_x - w/2)
+                        y = int(center_y - h / 2)
+                        boxes.append([x, y, w, h])
+                        confs.append(float(conf))
+                        class_ids.append(class_id)
         return boxes, confs, class_ids
 
     #Drawing Rectangles, Printing Texts, Counting the Total Number of Objects etc 
