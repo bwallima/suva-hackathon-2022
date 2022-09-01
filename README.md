@@ -1,38 +1,65 @@
-# Helmet Detection using YOLOV3
-Its a simple YOLO model to detect and count the number of people wearing helmet in a image. this model can be used to detect the intrusion or to find the people ridding bike without helmet.
+# Cyclists-Helmet-Detection
 
-Here you can read my post in detail  https://medium.com/@vijaysingh_60587/train-your-own-custom-model-for-helmet-detection-object-detection-using-yolo-f53a48066d7a
+An Implementation of YOLOv3 Object Detection Algorithm to detect Cyclists and their Helmets in a set of images.
+These images are scrapped from Google Images using the Keyword "Cyclists". Although this keyword can be customised like many other things in the script.
+Thus for the script to work with its default parameters and paths, I'd highly recommend to please place files as shown in the below Directory Tree. 
 
-Getting Started
-#### This code is very simple and with the help of little manipulation, you can count the number of detection for a particular detection.
-#### or extract the co-ordinates of bounding boxes. download the models, create necessary files and give full path to the models and folder names and run the python script.
+The Structure should be as follows:
 
-#### training:  
-  if you want to train your own model, follow the [darknet](https://github.com/AlexeyAB/darknet).
-Prerequisites  
-install python3.  
-install pip3.  
-install opencv.( sudo pip3 install opencv-python ).  
+└── Cyclists-Helmet-Detection(Main Branch)\
+&nbsp;&nbsp;&nbsp;&nbsp;├── chromedriver\
+&nbsp;&nbsp;&nbsp;&nbsp;├── Grab_that_image.py\
+&nbsp;&nbsp;&nbsp;&nbsp;├── main.py\
+&nbsp;&nbsp;&nbsp;&nbsp;├── requirements.txt\
+&nbsp;&nbsp;&nbsp;&nbsp;├── Run_cyclists_counter.py\
+&nbsp;&nbsp;&nbsp;&nbsp;├── Run_helmet_detector.py\
+&nbsp;&nbsp;&nbsp;&nbsp;├── yolo\
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── coco.names\
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── yolov3.cfg\
+&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── yolov3.weights\
+&nbsp;&nbsp;&nbsp;&nbsp;└── yolo_helmet\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── obj.names\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── yolov3-obj_2400.weights\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── yolov3-obj.cfg\
+        
+3 directories, 12 files
 
-install other liberaries  if missing.  
+# Web Scraping:-
+Web Scraping is done using Selenium. It takes access of Google Chrome, thus chromedriver is mandatory and the chromedriver version should specifically match with the GoogleChrome Version installed on your system.
+1. Check Version of Google Chrome -----> Open Chrome > Settings > About Chromw (Leftmost Panel)> Check version.
+2. To download relevant chromedriver, this link should be used else lastest version is already uploaded in the repository -----> https://chromedriver.chromium.org/downloads
 
+# YOLO:-
+This Script uses the concept of Transfer Learning and the yolo pretrained-weights.
+YOLOv3 for Cyclist Detection and YOLOV3-Obj for Helmet Detection. Thus the weights, cfg, obj files are needed to be downloaded and are easily accessible from the link given below.
 
-After setting up the paths.  
-change the path of classfile in line 19,  
-change the path of configuration file in line 25,  
-change the path of weights in line 26  
-change the output folder name in line 133 where you want to keep your output files.  
-change the name of folder in line 150 for input images.  
-, it's ready to run.  
-open terminal and python3 Helmet_detection_YOLOV3.py  
+Yolo & Yolo_helmet Folder - https://drive.google.com/drive/folders/1QV9DQj2oqdrruuhSiu9pl6SP19unTafi?usp=sharing
 
-#### link to files.  
-[model](https://drive.google.com/file/d/1_xBdP1GRK4i7yzJP8_a5GWaejZZKjdyI/view?usp=sharing)  
-[cfg](https://drive.google.com/file/d/119l1wonij3kXcuyAHC6-jRTw1NT0FzFH/view?usp=sharing)  
-[obj.names](https://drive.google.com/file/d/1eSA8XVuzCe9Ka63v-HEWx7Hxo8z_cpaF/view?usp=sharing)  
-If everything went well. you will get results like this  
-![img1](https://github.com/BlcaKHat/yolov3-Helmet-Detection/blob/master/test_out/img3.jpg)  
-![img2](https://github.com/BlcaKHat/yolov3-Helmet-Detection/blob/master/test_out/img4.jpg)  
-![img3](https://github.com/BlcaKHat/yolov3-Helmet-Detection/blob/master/test_out/img.jpg)  
+# Points to Remember:
+1. main.py consists of two classes, One for Cyclists Detection and Counter and Second for Helmet+Cyclists Detection and Counter. 
+2. Run Run_cyclist_counter.py file for Cyclists Detection
+3. Run Run_helmet_detector.py file for Cyclists and Helmet Detection
+4. While OpenCV uses its window to display the detections, pls press 'Esc' Key to scroll and view the image one by one.
+5. All the detections will be saved in the "images" folder which will be created after scraping.
+6. Make sure DRIVER_PATH in Grab_that_image.py leads to the chromedriver file
+7. Number of images to be scraped can be entered in Grab_that_image.py. Default is 5. 
+
+# STEPS TO RUN THE SCRIPT:
+1. Run Requirements.txt file as follows:
+    $ pip install -r requirements.txt
+2. Run Grab_that_image.py
+3. Run Run_helmet_detector.py
+
+# Outputs:
+"images" folder will have 2 sub-folders which will contain all the detected images with the counts on them.
+The outputs looks something just like this:\
+Cyclists Detection:-\
+![alt text](https://github.com/CuFFaz/Cyclists-Helmet-Detection/blob/main/images/cyclist/f80b6ad9e4.jpg)\
+![alt text](https://github.com/CuFFaz/Cyclists-Helmet-Detection/blob/main/images/cyclist/a065255504.jpg)
+
+Helmet Detections:-\
+![alt text](https://github.com/CuFFaz/Cyclists-Helmet-Detection/blob/main/images/Helmet_detections/Image.00049.jpeg)\
+![alt text](https://github.com/CuFFaz/Cyclists-Helmet-Detection/blob/main/images/Helmet_detections/Image.00032.jpeg)
+
 
 
