@@ -14,6 +14,8 @@ cnt_helmets = []
 cnt_no_helmets = []
 
 cam = cv2.VideoCapture(0)
+model, classes, colors, output_layers = cyclistCounter.load_yolo()
+
 
 while True:
     check, image = cam.read()
@@ -22,7 +24,7 @@ while True:
 
     print('\n')
     #Feeding our individual image to our Helmet Detection Class
-    detected_img = cyclistCounter.image_detect(image, cnt_cyclist, height, width)
+    detected_img = cyclistCounter.image_detect(image, cnt_cyclist, height, width, model, classes, colors, output_layers)
     frame, outs = helmet_detection.get_detection(frame=image, copy_frame=image, numb_cyclist = detected_img,
                                                  cnt_helmets=cnt_helmets, cnt_no_helmets=cnt_no_helmets)
     

@@ -74,9 +74,7 @@ class cyclistCounter():
 
     #Flow
     @staticmethod
-    def image_detect(image, cnt_cyclist, height, width):
-
-        model, classes, colors, output_layers = cyclistCounter.load_yolo()
+    def image_detect(image, cnt_cyclist, height, width, model, classes, colors, output_layers):
         blob, outputs = cyclistCounter.detect_objects(image, model, output_layers)
         boxes, confs, class_ids = cyclistCounter.get_box_dimensions(outputs, height, width)
         numb_cyclist = cyclistCounter.draw_labels(boxes, confs, colors, class_ids, classes, image, cnt_cyclist)
@@ -88,7 +86,7 @@ class helmet_detection(cyclistCounter):
     #Constructor
     def __init__(self):
         # Initialize the parameters
-        self.confThreshold = 0.4  #Confidence threshold
+        self.confThreshold = 0.8  #Confidence threshold
         self.nmsThreshold = 0.4   #Non-maximum suppression threshold
         self.inpWidth = 416       #Width of network's input image
         self.inpHeight = 416      #Height of network's input image
