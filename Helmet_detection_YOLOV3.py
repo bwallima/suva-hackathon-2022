@@ -1,6 +1,5 @@
 from time import sleep
 import cv2 as cv
-import time
 import argparse
 import sys
 import numpy as np
@@ -16,13 +15,20 @@ inpWidth = 416       #Width of network's input image
 inpHeight = 416      #Height of network's input image
 
 
+# Load names of classes
+classesFile = "obj.names";
+classes = None
+with open(classesFile, 'rt') as f:
+    classes = f.read().rstrip('\n').split('\n')
 
+# Give the configuration and weight files for the model and load the network using them.
+modelConfiguration = "yolov3-obj.cfg";
+modelWeights = "yolov3-obj_2400.weights";
 
-cam = cv.VideoCapture(0)
+net = cv.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
+net.setPreferableBackend(cv.dnn.DNN_BACKEND_OPENCV)
+net.setPreferableTarget(cv.dnn.DNN_TARGET_CPU)
 
-cv.namedWindow("test")
-
-img_counter = 0
 # Get the names of the output layers
 def getOutputsNames(net):
     # Get the names of all the layers in the network
@@ -125,95 +131,11 @@ def postprocess(frame, outs):
 
     if count_person >= 1:
         path = 'test_out/'
-        #frame_name=os.path.basename(fn)             # trimm the path and give file name.
+        frame_name=os.path.basename(fn)             # trimm the path and give file name.
         cv.imwrite(str(path)+frame_name, frame)     # writing to folder.
         #print(type(frame))
         cv.imshow('img',frame)
         cv.waitKey(800)
-# Load names of classes
-classesFile = "obj.names";
-classes = None
-with open(classesFile, 'rt') as f:
-    classes = f.read().rstrip('\n').split('\n')
-print(classes)
-
-# Give the configuration and weight files for the model and load the network using them.
-modelConfiguration = "yolov3-obj.cfg";
-modelWeights = "yolov3-obj_2400.weights";
-
-net = cv.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
-net.setPreferableBackend(cv.dnn.DNN_BACKEND_OPENCV)
-net.setPreferableTarget(cv.dnn.DNN_TARGET_CPU)
-
-
-while True:
-    ret, frame = cam.read()
-    if not ret:
-        print("failed to grab frame")
-        break
-    cv.imshow("test", frame)
-    time.sleep(1)
-    frame_count =0
-
-    # Create a 4D blob from a frame.
-    blob = cv.dnn.blobFromImage(frame, 1/255, (inpWidth, inpHeight), [0,0,0], 1, crop=False)
-
-    # Sets the input to the network
-    net.setInput(blob)
-
-    # Runs the forward pass to get output of the output layers
-    outs = net.forward(getOutputsNames(net))
-
-    # Remove the bounding boxes with low confidence
-    postprocess(frame, outs)
-
-    # Put efficiency information. The function getPerfProfile returns the overall time for inference(t) and the timings for each of the layers(in layersTimes)
-    t, _ = net.getPerfProfile()
-    #print(t)
-    label = 'Inference time: %.2f ms' % (t * 1000.0 / cv.getTickFrequency())
-    #print(label)
-    cv.putText(frame, label, (0, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
-    #print(label)
-    k = cv.waitKey(1)
-    if k%256 == 27:
-        # ESC pressed
-        print("Escape hit, closing...")
-        break
-    elif k%256 == 32:
-        # SPACE pressed
-        img_name = "opencv_frame_{}.png".format(img_counter)
-        cv.imwrite(img_name, frame)
-        print("{} written!".format(img_name))
-        img_counter += 1
-
-cam.release()
-
-cv.destroyAllWindows()
-
-
-
-
-
-
-
-
-
-# Load names of classes
-classesFile = "obj.names";
-classes = None
-with open(classesFile, 'rt') as f:
-    classes = f.read().rstrip('\n').split('\n')
-print(classes)
-
-# Give the configuration and weight files for the model and load the network using them.
-modelConfiguration = "yolov3-obj.cfg";
-modelWeights = "yolov3-obj_2400.weights";
-
-net = cv.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
-net.setPreferableBackend(cv.dnn.DNN_BACKEND_OPENCV)
-net.setPreferableTarget(cv.dnn.DNN_TARGET_CPU)
-
-
 
 
     #cv.imwrite(frame_name, frame)
