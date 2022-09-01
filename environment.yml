@@ -1,4 +1,4 @@
-name: wab-test
+name: helmet-detection
 channels:
   - defaults
 dependencies:
@@ -104,4 +104,4 @@ dependencies:
   - zstd=1.5.2=ha4553b6_0
   - pip:
     - opencv-python==4.3.0.36
-prefix: /home/bwallima/anaconda3/envs/wab-test
+
