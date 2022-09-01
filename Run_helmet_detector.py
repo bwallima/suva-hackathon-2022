@@ -24,6 +24,9 @@ image_paths = list(paths.list_images("images"))
 
 cam = cv2.VideoCapture(0)
 
+# Load yolo model for cyclist
+model, classes, colors, output_layers = cyclistCounter.load_yolo()
+
 while True:
     check, image = cam.read()
     image_path = '/home/bwallima/PycharmProjects/Cyclists-Helmet-Detection/temp_image.jpg'
@@ -35,7 +38,7 @@ while True:
     #Just some space to make things look clean
     print('\n')
     #Feeding our individual image to our Helmet Detection Class
-    detected_img = cyclistCounter.image_detect(image_path, cnt_cyclist)
+    detected_img = cyclistCounter.image_detect(image, cnt_cyclist, model, classes, colors, output_layers)
     frame, outs = helmet_detection.get_detection(frame=image,image_path=image_path, copy_frame=image, numb_cyclist = detected_img, cnt_helmets=cnt_helmets, cnt_no_helmets=cnt_no_helmets)
     
     """

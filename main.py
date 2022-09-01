@@ -84,8 +84,7 @@ class cyclistCounter():
         return numb_cyclist
 
     #Flow
-    def image_detect(img_path, cnt_cyclist): 
-        model, classes, colors, output_layers = cyclistCounter.load_yolo()
+    def image_detect(img_path, cnt_cyclist, model, classes, colors, output_layers):
         image, height, width, channels = cyclistCounter.load_image(img_path)
         blob, outputs = cyclistCounter.detect_objects(image, model, output_layers)
         boxes, confs, class_ids = cyclistCounter.get_box_dimensions(outputs, height, width)
