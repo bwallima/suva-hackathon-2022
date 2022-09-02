@@ -16,7 +16,7 @@ net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
 net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
 cam = cv2.VideoCapture(0)
-
+trafficLight = trafficlight.TrafficLight()
 while True:
     start = time.time()
     check, image = cam.read()
@@ -38,3 +38,17 @@ while True:
                                    cnt_helmets=cnt_helmets, cnt_no_helmets=cnt_no_helmets, net=net)
 
     print(f"Loop time: {time.time() - start}")
+
+    if numb_cyclist > 0:
+        if (cnt_helmets[-1] > 0 and cnt_helmets[-1] > cnt_no_helmets[-1]):
+            #smile
+            trafficLight.update_image(1)
+        elif cnt_no_helmets[-1] > 0:
+            #cry
+            trafficLight.update_image(2)
+        else:
+            #neutral
+            trafficLight.update_image(0)
+    else:
+        #neutral
+        trafficLight.update_image(0)
