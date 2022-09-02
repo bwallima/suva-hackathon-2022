@@ -1,10 +1,11 @@
 import cv2
-import numpy as np 
-import os
+import numpy as np
+import time
 
-#Class to Detect Cyclists and Cycles in images
+
+# Class to Detect Cyclists and Cycles in images
 class cyclistCounter():
-    #Loading yolo
+    # Loading yolo
     def load_yolo():
         net = cv2.dnn.readNet("yolo/yolov3.weights", "yolo/yolov3.cfg")
         classes = []
@@ -12,17 +13,18 @@ class cyclistCounter():
             classes = [line.strip() for line in f.readlines()]
 
         layers_names = net.getLayerNames()
-        output_layers = [layers_names[i[0]-1] for i in net.getUnconnectedOutLayers()]
+        output_layers = [layers_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
         colors = np.random.uniform(0, 255, size=(len(classes), 3))
         return net, classes, colors, output_layers
 
-    #Detecting out two classes, cyclists and their cycles using YOLOv3
-    def detect_objects(img, net, outputLayers):			
+    # Detecting out two classes, cyclists and their cycles using YOLOv3
+    def detect_objects(img, net, outputLayers):
         blob = cv2.dnn.blobFromImage(img, scalefactor=0.00392, size=(320, 320), mean=(0, 0, 0), swapRB=True, crop=False)
         net.setInput(blob)
         outputs = net.forward(outputLayers)
         return blob, outputs
-    #Extracting dimensions of detected objects
+
+    # Extracting dimensions of detected objects
     def get_box_dimensions(outputs, height, width):
         boxes = []
         confs = []
@@ -32,21 +34,21 @@ class cyclistCounter():
                 scores = detect[5:]
                 class_id = np.argmax(scores)
                 conf = scores[class_id]
-                #ignoring all classes except the first two (person & bicycle) of the coco.names list
-                if class_id <=1:
+                # ignoring all classes except the first two (person & bicycle) of the coco.names list
+                if class_id <= 1:
                     if conf > 0.3:
                         center_x = int(detect[0] * width)
                         center_y = int(detect[1] * height)
                         w = int(detect[2] * width)
                         h = int(detect[3] * height)
-                        x = int(center_x - w/2)
+                        x = int(center_x - w / 2)
                         y = int(center_y - h / 2)
                         boxes.append([x, y, w, h])
                         confs.append(float(conf))
                         class_ids.append(class_id)
         return boxes, confs, class_ids
 
-    #Drawing Rectangles, Printing Texts, Counting the Total Number of Objects etc 
+    # Drawing Rectangles, Printing Texts, Counting the Total Number of Objects etc
     def draw_labels(boxes, confs, colors, class_ids, classes, img, cnt_cyclist):
         winName = "Cyclist Counter"
         indexes = cv2.dnn.NMSBoxes(boxes, confs, 0.5, 0.4)
@@ -54,25 +56,24 @@ class cyclistCounter():
         numb_cyclist = 0
         numb_cycles = 0
         imgh, imgw, _ = img.shape
-        print_w = round(5*imgw/100)
-        print_h = round(5*imgh/100)
+        print_w = round(5 * imgw / 100)
+        print_h = round(5 * imgh / 100)
         for i in range(len(boxes)):
             if i in indexes:
                 x, y, w, h = boxes[i]
-                
+
                 label = str(classes[class_ids[i]])
                 color = colors[i]
-                if label=="person":
-                    numb_cyclist = numb_cyclist+1
-                elif label=="bicycle":
-                    numb_cycles = numb_cycles+1
-                cv2.rectangle(img, (x,y), (x+w, y+h), color, 2)
-                cv2.putText(img, label, (x, y - 5), font, 1, color, 1)
+                if label == "person":
+                    numb_cyclist = numb_cyclist + 1
+                elif label == "bicycle":
+                    numb_cycles = numb_cycles + 1
+                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
 
         cnt_cyclist.append(numb_cyclist)
         return numb_cyclist
 
-    #Flow
+    # Flow
     @staticmethod
     def image_detect(image, cnt_cyclist, height, width, model, classes, colors, output_layers):
         blob, outputs = cyclistCounter.detect_objects(image, model, output_layers)
@@ -81,42 +82,36 @@ class cyclistCounter():
         return numb_cyclist
 
 
-#Class to detect Helmets and Non Helmets in images.
+# Class to detect Helmets and Non Helmets in images.
 class helmet_detection(cyclistCounter):
-    #Constructor
+    # Constructor
     def __init__(self):
         # Initialize the parameters
-        self.confThreshold = 0.8  #Confidence threshold
-        self.nmsThreshold = 0.4   #Non-maximum suppression threshold
-        self.inpWidth = 416       #Width of network's input image
-        self.inpHeight = 416      #Height of network's input image
+        self.confThreshold = 0.4  # Confidence threshold
+        self.nmsThreshold = 0.4  # Non-maximum suppression threshold
+        self.inpWidth = 416  # Width of network's input image
+        self.inpHeight = 416  # Height of network's input image
         # Load names of classes
         classesFile = "yolo_helmet/obj.names";
         self.classes = None
         with open(classesFile, 'rt') as f:
             self.classes = f.read().rstrip('\n').split('\n')
 
-        # Give the configuration and weight files for the model and load the network using them.
-        modelConfiguration = "yolo_helmet/yolov3-obj.cfg";
-        modelWeights = "yolo_helmet/yolov3-obj_2400.weights";
-        self.net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
-        self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
-        self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
-
-    #Get the names of the output layers
-    def getOutputsNames(self):
+    # Get the names of the output layers
+    @staticmethod
+    def getOutputsNames(net):
         # Get the names of all the layers in the network
-        layersNames = self.net.getLayerNames()
+        layersNames = net.getLayerNames()
         # Get the names of the output layers, i.e. the layers with unconnected outputs
-        return [layersNames[i[0] - 1] for i in self.net.getUnconnectedOutLayers()]
+        return [layersNames[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
-    #Draw the predicted bounding box
+    # Draw the predicted bounding box
     def drawPred(self, frame, confidences, indices, count_person, boxes, numb_cyclist, cnt_helmets, cnt_no_helmets):
         winName = "Helmet_Detection"
         imgh, imgw, _ = frame.shape
         fold_path = "images/Helmet_detections"
-        print_w = round(8*imgw/100)
-        print_h = round(8*imgh/100)
+        print_w = round(8 * imgw / 100)
+        print_h = round(8 * imgh / 100)
         for i in indices:
             i = i[0]
             conf = confidences[i]
@@ -127,21 +122,23 @@ class helmet_detection(cyclistCounter):
             height = box[3]
             right = left + width
             bottom = top + height
-        
-            #Draw a bounding box around the object demensions, Print Texts on images, Count several detections to be printed in terminal.
+
+            # Draw a bounding box around the object demensions, Print Texts on images, Count several detections to be printed in terminal.
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 255), 3)
-            cv2.putText(frame, "helmet", (left, bottom + 15), cv2.FONT_HERSHEY_PLAIN, 1, (0,255,255), 1)
-        count_no_helmets = numb_cyclist-count_person
+            cv2.putText(frame, "helmet", (left, bottom + 15), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 255), 1)
+        count_no_helmets = numb_cyclist - count_person
         cnt_helmets.append(count_person)
         cnt_no_helmets.append(count_no_helmets)
-        cv2.rectangle(frame, (print_w-30,print_h-30), (print_w+320, print_h+30), (255,255,255), -1)
-        cv2.putText(frame, "Count of Cyclists with Helmets :{}".format(count_person),(print_w,print_h), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,0), 1)
-        cv2.putText(frame, "Count of Cyclists without Helmets :{}".format(count_no_helmets),(print_w,print_h+15), cv2.FONT_HERSHEY_PLAIN, 1, (0,0,0), 1)
+        cv2.rectangle(frame, (print_w - 30, print_h - 30), (print_w + 320, print_h + 30), (255, 255, 255), -1)
+        cv2.putText(frame, "Count of Cyclists with Helmets :{}".format(count_person), (print_w, print_h),
+                    cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1)
+        cv2.putText(frame, "Count of Cyclists without Helmets :{}".format(count_no_helmets), (print_w, print_h + 15),
+                    cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1)
 
         cv2.imshow(winName, frame)
         cv2.waitKey(27)
 
-    #Remove the bounding boxes with low confidence using non-maxima suppression
+    # Remove the bounding boxes with low confidence using non-maxima suppression
     def postprocess(self, frame, outs, numb_cyclist, cnt_helmets, cnt_no_helmets):
         frameHeight = frame.shape[0]
         frameWidth = frame.shape[1]
@@ -169,25 +166,25 @@ class helmet_detection(cyclistCounter):
         # Perform non maximum suppression to eliminate redundant overlapping boxes with
         # lower confidences.
         indices = cv2.dnn.NMSBoxes(boxes, confidences, self.confThreshold, self.nmsThreshold)
-        count_person = len(indices) # for counting the classes in this loop.
-        
-            #this function in  loop is calling drawPred so, try pushing one test counter in parameter , so it can calculate it.
-        self.drawPred(frame, confidences, indices, count_person, boxes, numb_cyclist, cnt_helmets, cnt_no_helmets)
-            #increase test counter till the loop end then print...
+        count_person = len(indices)  # for counting the classes in this loop.
 
-    #Flow
-    def get_detection(self, frame, numb_cyclist, cnt_helmets, cnt_no_helmets, copy_frame=None):
+        # this function in  loop is calling drawPred so, try pushing one test counter in parameter , so it can calculate it.
+        self.drawPred(frame, confidences, indices, count_person, boxes, numb_cyclist, cnt_helmets, cnt_no_helmets)
+        # increase test counter till the loop end then print...
+
+    # Flow
+    def get_detection(self, frame, numb_cyclist, cnt_helmets, cnt_no_helmets, net, copy_frame=None):
         if copy_frame is None:
             copy_frame = frame
 
         # Create a 4D blob from a frame.
-        blob = cv2.dnn.blobFromImage(frame, 1 / 255, (frame.shape[0], frame.shape[1]), [0, 0, 0], 1, crop=False)
+        blob = cv2.dnn.blobFromImage(frame, 1 / 255, (256, 256), [0, 0, 0], 1, crop=False)
 
         # Sets the input to the network
-        self.net.setInput(blob)
+        net.setInput(blob)
 
         # Runs the forward pass to get output of the output layers
-        outs = self.net.forward(self.getOutputsNames())
+        outs = net.forward(self.getOutputsNames(net))
 
         # Remove the bounding boxes with low confidence
         self.postprocess(copy_frame, outs, numb_cyclist, cnt_helmets, cnt_no_helmets)
@@ -195,6 +192,6 @@ class helmet_detection(cyclistCounter):
         # Put efficiency information.
         # The function getPerfProfile returns the overall time for inference(t) and
         # the timings for each of the layers(in layersTimes)
-        t, _ = self.net.getPerfProfile()
+        t, _ = net.getPerfProfile()
         label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
         return copy_frame, outs
