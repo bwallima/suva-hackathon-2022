@@ -25,10 +25,14 @@ while True:
     height, width, channels = image.shape
 
     # Feeding our individual image to our Helmet Detection Class
-    numb_cyclist = cyclistCounter.image_detect(image, cnt_cyclist, height, width, model, classes, colors,
+    numb_cyclist, return_boxes = cyclistCounter.image_detect(image, cnt_cyclist, height, width, model, classes, colors,
                                                         output_layers)
-    if numb_cyclist == 0:
-        print(time.time())
+    box_area = max([box[2] * box[3] for box in return_boxes] + [0])
+    print(box_area)
+    if numb_cyclist == 0 or box_area < 50000:
+        print(f'Time without helmet detection: {time.time()}')
+        cv2.imshow("Helmet_Detection", image)
+        cv2.waitKey(27)
         continue
     helmet_detection.get_detection(frame=image, copy_frame=image, numb_cyclist=numb_cyclist,
                                    cnt_helmets=cnt_helmets, cnt_no_helmets=cnt_no_helmets, net=net)

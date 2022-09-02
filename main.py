@@ -58,10 +58,11 @@ class cyclistCounter():
         imgh, imgw, _ = img.shape
         print_w = round(5 * imgw / 100)
         print_h = round(5 * imgh / 100)
+        return_boxes = []
         for i in range(len(boxes)):
             if i in indexes:
                 x, y, w, h = boxes[i]
-
+                return_boxes.append(boxes[i])
                 label = str(classes[class_ids[i]])
                 color = colors[i]
                 if label == "person":
@@ -71,15 +72,15 @@ class cyclistCounter():
                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
 
         cnt_cyclist.append(numb_cyclist)
-        return numb_cyclist
+        return min(numb_cyclist, numb_cycles), return_boxes
 
     # Flow
     @staticmethod
     def image_detect(image, cnt_cyclist, height, width, model, classes, colors, output_layers):
         blob, outputs = cyclistCounter.detect_objects(image, model, output_layers)
         boxes, confs, class_ids = cyclistCounter.get_box_dimensions(outputs, height, width)
-        numb_cyclist = cyclistCounter.draw_labels(boxes, confs, colors, class_ids, classes, image, cnt_cyclist)
-        return numb_cyclist
+        numb_cyclist, return_boxes = cyclistCounter.draw_labels(boxes, confs, colors, class_ids, classes, image, cnt_cyclist)
+        return numb_cyclist, return_boxes
 
 
 # Class to detect Helmets and Non Helmets in images.
@@ -178,7 +179,7 @@ class helmet_detection(cyclistCounter):
             copy_frame = frame
 
         # Create a 4D blob from a frame.
-        blob = cv2.dnn.blobFromImage(frame, 1 / 255, (256, 256), [0, 0, 0], 1, crop=False)
+        blob = cv2.dnn.blobFromImage(frame, 1 / 255, (128, 128), [0, 0, 0], 1, crop=False)
 
         # Sets the input to the network
         net.setInput(blob)
