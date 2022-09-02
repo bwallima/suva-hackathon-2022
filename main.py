@@ -194,4 +194,4 @@ class helmet_detection(cyclistCounter):
         # the timings for each of the layers(in layersTimes)
         t, _ = net.getPerfProfile()
         label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
-        return copy_frame, outs
+        return copy_frame, outs, numb_cyclist, cnt_helmets, cnt_no_helmets
