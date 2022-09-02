@@ -1,43 +1,39 @@
-#Importing necessary Libraries and Packages.
 from main import cyclistCounter, helmet_detection
-from imutils import paths
 import cv2
-import os
-from gui import trafficlight
+import time
 
-###Initializing or helmet detection and counter
-#Instantiating our helmet class
 helmet_detection = helmet_detection()
-
-#Empty lists for multiple counts.
 cnt_cyclist = []
 cnt_helmets = []
 cnt_no_helmets = []
 
-#Create directory if it doesnt already exists.
-#This is where our helmet detected images will be saved.
-if not os.path.exists('images/Helmet_detections'):
-    os.mkdir('images/Helmet_detections')
-
-#Get Image Paths in the form of a list
-image_paths = list(paths.list_images("images"))
-#Looping through every individual path
+# load models
+model, classes, colors, output_layers = cyclistCounter.load_yolo()
+modelConfiguration = "yolo_helmet/yolov3-obj.cfg"
+modelWeights = "yolo_helmet/yolov3-obj_2400.weights"
+net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
 cam = cv2.VideoCapture(0)
 trafficLight = trafficlight.TrafficLight()
 while True:
+    start = time.time()
     check, image = cam.read()
-    image_path = '/home/bwallima/PycharmProjects/Cyclists-Helmet-Detection/temp_image.jpg'
-    cv2.imwrite(image_path, image)
 
-    #Reading the Image from the Path and Resizing it
-    image = cv2.imread(image_path)
     image = cv2.resize(image, dsize=(640, 480), interpolation=cv2.INTER_AREA)
-    #Just some space to make things look clean
-    print('\n')
-    #Feeding our individual image to our Helmet Detection Class
-    detected_img = cyclistCounter.image_detect(image_path, cnt_cyclist)
-    frame, outs,  numb_cyclist, cnt_helmets, cnt_no_helmets = helmet_detection.get_detection(frame=image,image_path=image_path, copy_frame=image, numb_cyclist = detected_img , cnt_helmets=cnt_helmets, cnt_no_helmets=cnt_no_helmets)
+    height, width, channels = image.shape
+
+    # Feeding our individual image to our Helmet Detection Class
+    cnt_cyclist = cyclistCounter.image_detect(image, cnt_cyclist, height, width, model, classes, colors,
+                                                        output_layers)
+    if cnt_cyclist == 0:
+        print(time.time())
+        continue
+    frame, outs,  numb_cyclist, cnt_helmets, cnt_no_helmets = helmet_detection.get_detection(frame=image, copy_frame=image, numb_cyclist=cnt_cyclist,
+                                   cnt_helmets=cnt_helmets, cnt_no_helmets=cnt_no_helmets, net=net)
+
+    print(f"Loop time: {time.time() - start}")
 
     if numb_cyclist > 0:
         if (cnt_helmets[-1] > 0 and cnt_helmets[-1] > cnt_no_helmets[-1]):
@@ -52,5 +48,3 @@ while True:
     else:
         #neutral
         trafficLight.update_image(0)
-
-
