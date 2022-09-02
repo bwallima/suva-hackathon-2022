@@ -1,6 +1,7 @@
 from main import cyclistCounter, helmet_detection
 import cv2
 import time
+from gui import trafficlight
 
 helmet_detection = helmet_detection()
 cnt_cyclist = []
@@ -17,6 +18,8 @@ net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
 cam = cv2.VideoCapture(0)
 trafficLight = trafficlight.TrafficLight()
+trafficLightSeries = [0, 0]
+trafficLight.update_image(0)
 while True:
     start = time.time()
     check, image = cam.read()
@@ -33,6 +36,9 @@ while True:
         print(f'Time without helmet detection: {time.time()}')
         cv2.imshow("Helmet_Detection", image)
         cv2.waitKey(27)
+        trafficLightSeries = [trafficLightSeries[1], 0]
+        if trafficLightSeries[0] == trafficLightSeries[1] == 0:
+            trafficLight.update_image(0)
         continue
     helmet_detection.get_detection(frame=image, copy_frame=image, numb_cyclist=numb_cyclist,
                                    cnt_helmets=cnt_helmets, cnt_no_helmets=cnt_no_helmets, net=net)
@@ -41,14 +47,22 @@ while True:
 
     if numb_cyclist > 0:
         if (cnt_helmets[-1] > 0 and cnt_helmets[-1] > cnt_no_helmets[-1]):
+            trafficLightSeries = [trafficLightSeries[1], 1]
             #smile
-            trafficLight.update_image(1)
+            if trafficLightSeries[0] == trafficLightSeries[1] == 1:
+                trafficLight.update_image(1)
         elif cnt_no_helmets[-1] > 0:
+            trafficLightSeries = [trafficLightSeries[1], 2]
             #cry
-            trafficLight.update_image(2)
+            if trafficLightSeries[0] == trafficLightSeries[1] == 2:
+                trafficLight.update_image(2)
         else:
             #neutral
-            trafficLight.update_image(0)
+            trafficLightSeries = [trafficLightSeries[1], 0]
+            if trafficLightSeries[0] == trafficLightSeries[1] == 0:
+                trafficLight.update_image(0)
     else:
         #neutral
-        trafficLight.update_image(0)
+        trafficLightSeries = [trafficLightSeries[1], 0]
+        if trafficLightSeries[0] == trafficLightSeries[1] == 0:
+            trafficLight.update_image(0)

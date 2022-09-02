@@ -1,3 +1,4 @@
+import pathlib
 from tkinter import *
 from tkinter import ttk
 
@@ -20,10 +21,10 @@ class TrafficLight():
                            command=lambda:self.update_image())
         self.button.pack()
         #Open an Image in a Variable
-
-        im1= Image.open(".\images\smiley_grey.png")
-        im2= Image.open(".\images\smiley_green.png")
-        im3= Image.open(".\images\smiley_red.png")
+        imagespath = pathlib.Path(__file__).parent.parent.joinpath("images")
+        im1= Image.open(imagespath.joinpath("smiley_grey.png"))
+        im2= Image.open(imagespath.joinpath("smiley_green.png"))
+        im3= Image.open(imagespath.joinpath("smiley_red.png"))
         imgsize =  (300,300)
         resized_image1 = im1.resize(imgsize, Image.ANTIALIAS)
         resized_image2 = im2.resize(imgsize, Image.ANTIALIAS)

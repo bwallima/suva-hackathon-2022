@@ -88,7 +88,7 @@ class helmet_detection(cyclistCounter):
     # Constructor
     def __init__(self):
         # Initialize the parameters
-        self.confThreshold = 0.4  # Confidence threshold
+        self.confThreshold = 0.5  # Confidence threshold
         self.nmsThreshold = 0.4  # Non-maximum suppression threshold
         self.inpWidth = 416  # Width of network's input image
         self.inpHeight = 416  # Height of network's input image
@@ -179,7 +179,7 @@ class helmet_detection(cyclistCounter):
             copy_frame = frame
 
         # Create a 4D blob from a frame.
-        blob = cv2.dnn.blobFromImage(frame, 1 / 255, (128, 128), [0, 0, 0], 1, crop=False)
+        blob = cv2.dnn.blobFromImage(frame, 1 / 255, (256, 256), [0, 0, 0], 1, crop=False)
 
         # Sets the input to the network
         net.setInput(blob)
