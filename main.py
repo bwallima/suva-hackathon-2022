@@ -19,7 +19,7 @@ class cyclistCounter():
 
     # Detecting out two classes, cyclists and their cycles using YOLOv3
     def detect_objects(img, net, outputLayers):
-        blob = cv2.dnn.blobFromImage(img, scalefactor=0.00392, size=(320, 320), mean=(0, 0, 0), swapRB=True, crop=False)
+        blob = cv2.dnn.blobFromImage(img, scalefactor=0.00392, size=(256, 256), mean=(0, 0, 0), swapRB=True, crop=True)
         net.setInput(blob)
         outputs = net.forward(outputLayers)
         return blob, outputs
@@ -179,7 +179,7 @@ class helmet_detection(cyclistCounter):
             copy_frame = frame
 
         # Create a 4D blob from a frame.
-        blob = cv2.dnn.blobFromImage(frame, 1 / 255, (256, 256), [0, 0, 0], 1, crop=False)
+        blob = cv2.dnn.blobFromImage(frame, 1 / 255, (512, 512), [0, 0, 0], 1, crop=False)
 
         # Sets the input to the network
         net.setInput(blob)
