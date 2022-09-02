@@ -6,26 +6,24 @@ from PIL import Image, ImageTk
 
 class TrafficLight():
     def __init__(self):
-
+        width = 600
+        height = 850
         #Create an instance of tkinter frame
         self.win= Tk()
         #Set the geometry
-        self.win.geometry("850x600")
+        self.win.geometry(f'{width}x{height}')
         #Define function to update the image
 
         #Create a canvas and add the image into it
-        self.canvas= Canvas(self.win, width=400, height= 400)
+        self.canvas= Canvas(self.win, width=width, height= height)
         self.canvas.pack()
-        #Create a button to update the canvas image
-        self.button= ttk.Button(self.win, text="Update",
-                           command=lambda:self.update_image())
-        self.button.pack()
+
         #Open an Image in a Variable
         imagespath = pathlib.Path(__file__).parent.parent.joinpath("images")
-        im1= Image.open(imagespath.joinpath("smiley_grey.png"))
+        im1= Image.open(imagespath.joinpath("speed_sign.jpg"))
         im2= Image.open(imagespath.joinpath("smiley_green.png"))
         im3= Image.open(imagespath.joinpath("smiley_red.png"))
-        imgsize =  (300,300)
+        imgsize =  (width, height)
         resized_image1 = im1.resize(imgsize, Image.ANTIALIAS)
         resized_image2 = im2.resize(imgsize, Image.ANTIALIAS)
         resized_image3 = im3.resize(imgsize, Image.ANTIALIAS)
