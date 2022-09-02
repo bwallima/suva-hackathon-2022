@@ -130,11 +130,11 @@ class helmet_detection(cyclistCounter):
         count_no_helmets = numb_cyclist - count_person
         cnt_helmets.append(count_person)
         cnt_no_helmets.append(count_no_helmets)
-        cv2.rectangle(frame, (print_w - 30, print_h - 30), (print_w + 320, print_h + 30), (255, 255, 255), -1)
-        cv2.putText(frame, "Count of Cyclists with Helmets :{}".format(count_person), (print_w, print_h),
-                    cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1)
-        cv2.putText(frame, "Count of Cyclists without Helmets :{}".format(count_no_helmets), (print_w, print_h + 15),
-                    cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1)
+        #cv2.rectangle(frame, (print_w - 30, print_h - 30), (print_w + 320, print_h + 30), (255, 255, 255), -1)
+        #cv2.putText(frame, "Count of Cyclists with Helmets :{}".format(count_person), (print_w, print_h),
+        #            cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1)
+        #cv2.putText(frame, "Count of Cyclists without Helmets :{}".format(count_no_helmets), (print_w, print_h + 15),
+        #            cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 1)
 
         cv2.imshow(winName, frame)
         cv2.waitKey(27)
