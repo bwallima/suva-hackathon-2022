@@ -6,8 +6,8 @@ from PIL import Image, ImageTk
 
 class TrafficLight():
     def __init__(self):
-        width = 600
-        height = 850
+        width = 700
+        height = 900
         #Create an instance of tkinter frame
         self.win= Tk()
         #Set the geometry
@@ -20,7 +20,7 @@ class TrafficLight():
 
         #Open an Image in a Variable
         imagespath = pathlib.Path(__file__).parent.parent.joinpath("images")
-        im1= Image.open(imagespath.joinpath("speed_sign.jpg"))
+        im1= Image.open(imagespath.joinpath("smiley_grey.png"))
         im2= Image.open(imagespath.joinpath("smiley_green.png"))
         im3= Image.open(imagespath.joinpath("smiley_red.png"))
         imgsize =  (width, height)
