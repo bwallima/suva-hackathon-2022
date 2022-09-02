@@ -1,6 +1,7 @@
 from main import cyclistCounter, helmet_detection
 import cv2
 import time
+from gui import trafficlight
 
 helmet_detection = helmet_detection()
 cnt_cyclist = []
@@ -25,12 +26,12 @@ while True:
     height, width, channels = image.shape
 
     # Feeding our individual image to our Helmet Detection Class
-    cnt_cyclist = cyclistCounter.image_detect(image, cnt_cyclist, height, width, model, classes, colors,
+    numb_cyclist = cyclistCounter.image_detect(image, cnt_cyclist, height, width, model, classes, colors,
                                                         output_layers)
-    if cnt_cyclist == 0:
+    if numb_cyclist == 0:
         print(time.time())
         continue
-    frame, outs,  numb_cyclist, cnt_helmets, cnt_no_helmets = helmet_detection.get_detection(frame=image, copy_frame=image, numb_cyclist=cnt_cyclist,
+    helmet_detection.get_detection(frame=image, copy_frame=image, numb_cyclist=numb_cyclist,
                                    cnt_helmets=cnt_helmets, cnt_no_helmets=cnt_no_helmets, net=net)
 
     print(f"Loop time: {time.time() - start}")
