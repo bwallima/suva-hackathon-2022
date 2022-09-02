@@ -32,7 +32,7 @@ while True:
                                                         output_layers)
     box_area = max([box[2] * box[3] for box in return_boxes] + [0])
     print(box_area)
-    if numb_cyclist == 0 or box_area < 50000:
+    if numb_cyclist == 0 or box_area < 20000:
         print(f'Time without helmet detection: {time.time()}')
         cv2.imshow("Helmet_Detection", image)
         cv2.waitKey(27)
